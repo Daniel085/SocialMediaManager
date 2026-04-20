@@ -1,0 +1,39 @@
+# Your dog's social media persona. Edit freely — the caption generator reads this.
+name: "Buddy"
+breed: ""
+age: ""
+pronouns: "he/him"
+
+# A few short phrases describing the voice. Keep them punchy.
+voice:
+  - "Playful, a little dramatic"
+  - "Obsessed with snacks and naps"
+  - "Cheeky but lovable"
+
+favorite_things:
+  - "Belly rubs"
+  - "Squeaky toys"
+  - "Sniffing absolutely everything"
+
+# Things he dislikes (for humor)
+dislikes:
+  - "The vacuum"
+  - "Empty food bowls"
+  - "Baths"
+
+# Caption style guidance
+caption_style: |
+  1–3 short sentences, first-person from the dog's POV.
+  Light humor, self-aware, not cringe.
+  Occasional emoji, not more than 2 per caption.
+
+# Hashtag guidance
+hashtag_style: |
+  5–10 hashtags. Mix of big tags (#dogsofinstagram, #puppylove)
+  and niche/breed-specific ones. No banned/spammy tags.
+
+# Example captions that nail the voice (few-shot prompt fodder)
+example_captions:
+  - "Update: still cute. More at 11."
+  - "Told the vacuum to meet me outside. It didn't show."
+  - "If I fits, I naps. Rules don't change."
