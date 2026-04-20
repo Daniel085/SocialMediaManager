@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dog SMM — Review ({{ stats.captioned }} left)</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           max-width: 1200px; margin: 0 auto; padding: 1em; }
+    header { display: flex; justify-content: space-between; align-items: baseline;
+             border-bottom: 1px solid #ccc; padding-bottom: 0.5em; margin-bottom: 1em; }
+    header h1 { margin: 0; font-size: 1.2em; }
+    .stats { font-size: 0.85em; opacity: 0.75; }
+    .stats span { margin-left: 0.75em; }
+    .done { text-align: center; padding: 4em 0; opacity: 0.7; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; align-items: start; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    img { max-width: 100%; max-height: 80vh; border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .score { display: inline-block; padding: 0.2em 0.6em; border-radius: 4px;
+             background: #e8f5e9; color: #2e7d32; font-weight: 600; font-size: 0.9em; }
+    .path { opacity: 0.5; font-size: 0.8em; font-family: monospace; margin-left: 0.5em; }
+    .reason { opacity: 0.7; font-size: 0.9em; margin-top: 0.4em; }
+    label { display: block; font-weight: 600; margin: 1em 0 0.3em;
+            font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; }
+    textarea { width: 100%; box-sizing: border-box; padding: 0.6em;
+               font: inherit; border: 1px solid #aaa; border-radius: 4px;
+               background: transparent; color: inherit; }
+    textarea.caption { height: 6em; }
+    textarea.hashtags { height: 4em; }
+    .actions { display: flex; gap: 0.5em; margin-top: 1.25em; }
+    button { padding: 0.75em 1.5em; font: inherit; font-weight: 600;
+             border: none; border-radius: 4px; cursor: pointer; }
+    button.approve { background: #2e7d32; color: white; flex: 2; }
+    button.reject  { background: #c62828; color: white; flex: 1; }
+    button:hover { filter: brightness(1.1); }
+    .hint { opacity: 0.5; font-size: 0.8em; margin-top: 0.75em; }
+    .kbd { display: inline-block; padding: 0.1em 0.4em; background: rgba(127,127,127,0.2);
+           border-radius: 3px; font-family: monospace; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dog SMM — Review</h1>
+    <div class="stats">
+      <span>captioned: <b>{{ stats.captioned }}</b></span>
+      <span>approved: <b>{{ stats.approved }}</b></span>
+      <span>rejected: <b>{{ stats.rejected }}</b></span>
+      <span>posted: <b>{{ stats.posted }}</b></span>
+    </div>
+  </header>
+
+  {% if not entry %}
+    <div class="done">
+      <h2>All caught up.</h2>
+      <p>Nothing left to review. Run <code>dogsmm ingest &amp;&amp; dogsmm dedupe &amp;&amp; dogsmm filter &amp;&amp; dogsmm caption</code> to queue more.</p>
+    </div>
+  {% else %}
+    <div class="grid">
+      <div>
+        <img src="{{ url_for('media', subpath=entry.path) }}" alt="">
+      </div>
+      <form method="post" action="{{ url_for('action', action='approve') }}">
+        <input type="hidden" name="path" value="{{ entry.path }}">
+        <div>
+          <span class="score">{{ entry.score }}/10</span>
+          <span class="path">{{ entry.path }}</span>
+          <div class="reason">{{ entry.score_reason }}</div>
+        </div>
+        <label>Caption</label>
+        <textarea name="caption" class="caption" autofocus>{{ entry.caption }}</textarea>
+        <label>Hashtags</label>
+        <textarea name="hashtags" class="hashtags">{{ entry.hashtags }}</textarea>
+        <div class="actions">
+          <button type="submit" class="approve">Approve</button>
+          <button type="submit" class="reject"
+                  formaction="{{ url_for('action', action='reject') }}">Reject</button>
+        </div>
+        <div class="hint">
+          <span class="kbd">⌘/Ctrl + Enter</span> approve ·
+          <span class="kbd">Esc</span> then <span class="kbd">r</span> reject
+        </div>
+      </form>
+    </div>
+    <script>
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          document.querySelector('form').submit();
+        }
+        if (e.key === 'r' && document.activeElement.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          document.querySelector('button.reject').click();
+        }
+      });
+    </script>
+  {% endif %}
+</body>
+</html>

@@ -86,6 +86,20 @@ def caption(media_dir: Path, queue_path: Path, persona: Path, model: str) -> Non
 
 
 @cli.command()
+@click.option("--media-dir", default=DEFAULT_MEDIA, type=click.Path(path_type=Path))
+@click.option("--queue", "queue_path", default=DEFAULT_QUEUE, type=click.Path(path_type=Path))
+@click.option("--host", default="127.0.0.1", show_default=True)
+@click.option("--port", default=5000, show_default=True)
+def review(media_dir: Path, queue_path: Path, host: str, port: int) -> None:
+    """Start the local review UI at http://<host>:<port>."""
+    from dogsmm.review import create_app
+
+    app = create_app(media_dir, queue_path)
+    click.echo(f"Review UI: http://{host}:{port}/  (Ctrl+C to stop)")
+    app.run(host=host, port=port, debug=False)
+
+
+@cli.command()
 @click.option("--queue", "queue_path", default=DEFAULT_QUEUE, type=click.Path(path_type=Path))
 def status(queue_path: Path) -> None:
     """Show queue counts by status."""

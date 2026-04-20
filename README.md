@@ -37,6 +37,7 @@ python -m dogsmm ingest                       # scan media/ into queue (computes
 python -m dogsmm dedupe                       # reject near-duplicates
 python -m dogsmm filter --threshold 7         # score & auto-reject bad shots
 python -m dogsmm caption                      # write captions for the keepers
+python -m dogsmm review                       # open http://127.0.0.1:5000 to approve/reject
 python -m dogsmm status                       # show counts by status
 ```
 
@@ -46,14 +47,13 @@ saved after every item, so an interrupted run doesn't lose work.
 ## Statuses
 
 - `pending` — ingested, not yet scored
-- `rejected` — scored below threshold
+- `rejected` — scored below threshold, near-duplicate, or rejected in review
 - `captioned` — ready for review
-- `approved` — (future) marked for posting
+- `approved` — approved in review UI; ready to post
 - `posted` — (future) already on Instagram
 
 ## Roadmap
 
-- Review UI (local web app to approve / edit / reject captioned items)
 - Semantic dedupe via vision embeddings (catches "same scene, different burst"
   where pHash doesn't)
 - Video support (extract a frame with ffmpeg for vision scoring)
