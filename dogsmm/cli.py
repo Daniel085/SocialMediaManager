@@ -7,6 +7,7 @@ import click
 
 from dogsmm import queue as queue_mod
 from dogsmm.caption import caption_pending
+from dogsmm.dedupe import DEFAULT_THRESHOLD as DEDUPE_THRESHOLD, dedupe_queue
 from dogsmm.filter import filter_pending
 from dogsmm.ingest import ingest as ingest_fn
 
@@ -32,6 +33,29 @@ def ingest(media_dir: Path, queue_path: Path) -> None:
         raise click.ClickException(f"{media_dir} does not exist — drop photos there first.")
     added = ingest_fn(media_dir, queue_path)
     click.echo(f"Added {added} new file(s) to {queue_path}.")
+
+
+@cli.command()
+@click.option("--media-dir", default=DEFAULT_MEDIA, type=click.Path(path_type=Path))
+@click.option("--queue", "queue_path", default=DEFAULT_QUEUE, type=click.Path(path_type=Path))
+@click.option(
+    "--threshold",
+    default=DEDUPE_THRESHOLD,
+    show_default=True,
+    help="Hamming distance to treat as 'near-duplicate' (lower = stricter).",
+)
+def dedupe(media_dir: Path, queue_path: Path, threshold: int) -> None:
+    """Reject near-duplicates via perceptual hashing.
+
+    Checks candidates against each other and against already-approved/posted
+    items, so the same photo never gets queued twice.
+    """
+    stats = dedupe_queue(media_dir, queue_path, threshold)
+    click.echo(
+        f"checked={stats['checked']} "
+        f"rejected_vs_posted={stats['vs_posted']} "
+        f"rejected_vs_siblings={stats['vs_siblings']}"
+    )
 
 
 @cli.command(name="filter")

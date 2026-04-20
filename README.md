@@ -7,9 +7,13 @@ dog's persona. You approve, then post manually (for now).
 ## Pipeline
 
 ```
-media/  ── ingest ──►  queue.json  ── filter ──►  scored  ── caption ──►  captioned
-                                                (low scores rejected)      (ready to review)
+media/  ── ingest ──►  queue.json  ── dedupe ──►  unique  ── filter ──►  scored  ── caption ──►  captioned
+                                     (pHash)                (low scores rejected)                (ready to review)
 ```
+
+`dedupe` rejects near-duplicates via perceptual hash (catches burst-mode shots,
+resized copies, minor edits). It also rejects any candidate that matches an
+already-`approved` or `posted` item, so nothing gets posted twice.
 
 State lives in a single `queue.json` at the repo root — diffable, hand-editable,
 no database.
@@ -29,7 +33,8 @@ Edit `persona.yaml` so captions sound like your dog.
 ## Usage
 
 ```bash
-python -m dogsmm ingest                       # scan media/ into queue
+python -m dogsmm ingest                       # scan media/ into queue (computes pHash)
+python -m dogsmm dedupe                       # reject near-duplicates
 python -m dogsmm filter --threshold 7         # score & auto-reject bad shots
 python -m dogsmm caption                      # write captions for the keepers
 python -m dogsmm status                       # show counts by status
@@ -49,6 +54,8 @@ saved after every item, so an interrupted run doesn't lose work.
 ## Roadmap
 
 - Review UI (local web app to approve / edit / reject captioned items)
+- Semantic dedupe via vision embeddings (catches "same scene, different burst"
+  where pHash doesn't)
 - Video support (extract a frame with ffmpeg for vision scoring)
 - Posting — manual for now; later, either an "export for Buffer/Later" step or
   automated posting via `instagrapi` (carries ban risk on personal accounts)
